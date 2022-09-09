@@ -82,28 +82,45 @@ const warriorsGames = [{
       isWinner: false
     }
   }
-]
+];
 
-const ulParent = document.createElement('ul');
-for(let game of warriorsGames){
-    const {homeTeam, awayTeam} = game; //distructure
-    const gameLi = document.createElement('li');
+// ***********************************
+// REFACTORING THE CODE WITH FUNCTIONS
+// ***********************************
+
+const makeChart = (games, targetTeam) =>{
+    const ulParent = document.createElement('ul');
+    for(let game of games){
+        const gameLi = document.createElement('li');
+        gameLi.innerHTML = getScoreLine(game);
+        gameLi.classList.add(isWinner(game, targetTeam) ? 'win' : 'loss');
+        ulParent.appendChild(gameLi);
+    }
+    return ulParent;
+};
+
+const isWinner = ({homeTeam, awayTeam}, targetTeam) => {
+    const target = homeTeam.team === targetTeam ? homeTeam : awayTeam;
+    return target.isWinner;
+};
+
+const getScoreLine = ({homeTeam, awayTeam}) => {
     const {team: hTeam, points: hPoints} = homeTeam;
     const {team: aTeam, points: aPoints} = awayTeam;
-
     const teamNames = `${aTeam} @ ${hTeam}`;
-
     let scoreLine;
     if(aPoints > hPoints){
-        scoreLine = `<b>${aPoints}</b>-${hPoints}`;
+       scoreLine = `<b>${aPoints}</b>-${hPoints}`;
     }else {
-        scoreLine = `${aPoints}-<b>${hPoints}</b>`;
+       scoreLine = `${aPoints}-<b>${hPoints}</b>`;
     }
-    const warriors = hTeam === 'Golden State' ? homeTeam : awayTeam;
-    gameLi.classList.add(warriors.isWinner ? 'win' : 'loss');
+    return `${teamNames} ${scoreLine}`;
+};
 
-    gameLi.innerHTML = `${teamNames} ${scoreLine}`;
-    ulParent.appendChild(gameLi);
-}
+const chartWarriors = makeChart(warriorsGames, 'Golden State');
+const sectionWarriors = document.querySelector('#gs');
+sectionWarriors.appendChild(chartWarriors);
 
-document.body.prepend(ulParent);
+const chartHouston = makeChart(warriorsGames, 'Houston');
+const sectionHouston = document.querySelector('#hr');
+sectionHouston.appendChild(chartHouston);
